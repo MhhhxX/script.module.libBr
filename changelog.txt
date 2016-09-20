@@ -1,3 +1,12 @@
+0.3.1
+- Added search
+0.3.0
+- Improved thumbnail support
+- Improved metadata scraping
+- Added "next page" support
+0.2.1
+- Added support for PVR ReLive ARD-Alpha
+- Added Search
 0.2.0
 - Finalised support for a standalone add-on
 0.1.0

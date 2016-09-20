@@ -15,8 +15,10 @@ translation = xbmcaddon.Addon(id='script.module.libMediathek').getLocalizedStrin
 
 
 
-def getDate(date):
-	return libBrJsonParser.parseDate(date)
+def getDate(date,channel='BR'):
+	return libBrJsonParser.parseDate(date,channel)
+def search(searchString):
+	return libBrJsonParser.search(searchString)
 def getVideoUrl(url):
 	return libBrJsonParser.parseVideo(url)
 def play(dict):
@@ -31,8 +33,12 @@ def libBrPvrPlay(dict):
 	libBrPvr.play(dict)
 	
 def libBrListMain():
-	libMediathek.addEntry({'name':translation(31032), 'mode':'libBrListLetters'})
-	libMediathek.addEntry({'name':translation(31033), 'mode':'libBrListDate'})
+	dict = []
+	#dict.append({'name':translation(31030), 'mode':'libBrListVideos', 'url':''})
+	dict.append({'name':translation(31032), 'mode':'libBrListLetters'})
+	dict.append({'name':translation(31033), 'mode':'libBrListDate'})
+	dict.append({'name':translation(31039), 'mode':'libBrSearch'})
+	libMediathek.addEntries(dict)
 	#libMediathek.addEntry({'name':translation(31034), 'mode':'libArdListVideos', 'url':'http://www.ardmediathek.de/appdata/servlet/tv/Rubriken/mehr?documentId=21282550&json'})
 	
 	
@@ -59,6 +65,18 @@ def libBrListDateVideos():
 	xbmc.log(datum.strftime('%Y-%m-%d'))
 	libMediathek.addEntries(libBrJsonParser.parseDate(datum.strftime('%Y-%m-%d'),params['name']))#params['datum'] =yyyy-mm-dd
 	
+def libBrSearch():
+	keyboard = xbmc.Keyboard('', translation(31039))
+	keyboard.doModal()
+	if keyboard.isConfirmed() and keyboard.getText():
+		search_string = keyboard.getText()
+		libBrListSearch(search_string)
+
+def libBrListSearch(searchString=False):
+	if not searchString:
+		searchString = params['searchString']
+	libMediathek.addEntries(search(searchString))
+	
 def libBrPlay():
 	url = libBrJsonParser.parseVideo(params['url'])
 	xbmc.log(url)
@@ -74,7 +92,16 @@ def list():
 	'libBrListDate': libBrListDate,
 	'libBrListDateChannels': libBrListDateChannels,
 	'libBrListDateVideos': libBrListDateVideos,
+	'libBrSearch': libBrSearch,
+	'libBrListSearch': libBrListSearch,
 	'libBrPlay': libBrPlay
+	}
+	views = {
+	'libBrListShows': 'shows',
+	'libBrListVideos': 'videos',
+	'libBrListDate': 'videos',
+	'libBrListDateVideos': 'videos',
+	'libBrListSearch': 'videos'
 	}
 	global params
 	params = libMediathek.get_params()
@@ -85,5 +112,5 @@ def list():
 		libBrListMain()
 	else:
 		modes.get(params['mode'],libBrListMain)()
-	
+		libMediathek.setView(views.get(params['mode'],'default'))
 	xbmcplugin.endOfDirectory(int(sys.argv[1]))	
