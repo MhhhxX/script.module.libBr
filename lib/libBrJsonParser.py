@@ -52,7 +52,9 @@ def parseVideos(url):
 	if not 'latestVideos' in url:
 		response = _utils.getUrl(url)
 		j = json.loads(response)
-		url = j["_links"]["latestVideos"]["href"]
+		if "_links" in j and 'latestVideos' in j["_links"]:
+			url = j["_links"]["latestVideos"]["href"]
+		else: return []
 	return _parseLinks(url)
 	
 def _parseLinks(url):
