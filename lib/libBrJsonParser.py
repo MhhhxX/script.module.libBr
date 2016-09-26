@@ -46,7 +46,7 @@ def parseShows(letter):
 def search(searchString):
 	j = _parseMain()
 	url = j["_links"]["search"]["href"].replace('{term}',urllib.quote_plus(searchString))
-	return _parseLinks(url)
+	return parseLinks(url)
 	
 def parseVideos(url):
 	if not 'latestVideos' in url:
@@ -55,9 +55,9 @@ def parseVideos(url):
 		if "_links" in j and 'latestVideos' in j["_links"]:
 			url = j["_links"]["latestVideos"]["href"]
 		else: return []
-	return _parseLinks(url)
+	return parseLinks(url)
 	
-def _parseLinks(url):
+def parseLinks(url):
 	response = _utils.getUrl(url)
 	j = json.loads(response)
 	list = []
@@ -80,6 +80,11 @@ def _parseLinks(url):
 			dict['thumb'] = show["teaserImage"]["_links"]["image512"]["href"]
 		elif 'image256' in show["teaserImage"]["_links"]:
 			dict['thumb'] = show["teaserImage"]["_links"]["image256"]["href"]
+		try:
+			if show['hasSubtitle']:
+				dict['hasSubtitle'] = 'true'
+				#dict['plot'] += '\n\nUntertitel'
+		except:pass
 		dict['type'] = 'video'
 		dict['mode'] = 'libBrPlay'
 		
@@ -119,6 +124,9 @@ def parseDate(date,channel='BR'):
 			if dict['duration'] < 0:
 				dict['duration'] = 86400 - abs(dict['duration'])
 			#TODO: rest of properties
+			if b['hasSubtitle']:
+				dict['hasSubtitle'] = 'true'
+				#dict['plot'] += '\n\nUntertitel'
 			dict['type'] = 'date'
 			dict['mode'] = 'libBrPlay'
 			list.append(dict)
@@ -134,12 +142,15 @@ def parseVideo(url):#TODO grep the plot and other metadata from here
 	response = _utils.getUrl(url)
 	j = json.loads(response)
 	assets = j["assets"]
+	if 'dataTimedTextUrl' in j['_links']:
+		sub = j['_links']['dataTimedTextUrl']['href']
+	else: sub = False
 	for asset in assets:
 		if "type" in asset and asset["type"] == "HLS_HD":
-			return asset["_links"]["stream"]["href"]
+			return asset["_links"]["stream"]["href"],sub
 	for asset in assets:
 		if "type" in asset and asset["type"] == "HLS":
-			return asset["_links"]["stream"]["href"]
+			return asset["_links"]["stream"]["href"],sub
 			
 def startTimeToInt(s):
 	HH,MM,SS = s.split(":")

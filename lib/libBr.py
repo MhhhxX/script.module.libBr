@@ -10,7 +10,7 @@ import libMediathek
 from datetime import date, timedelta
 
 translation = xbmcaddon.Addon(id='script.module.libMediathek').getLocalizedString
-
+showSubtitles = xbmcaddon.Addon().getSetting('subtitle') == 'true'
 
 
 
@@ -35,11 +35,12 @@ def libBrPvrPlay(dict):
 def libBrListMain():
 	dict = []
 	#dict.append({'name':translation(31030), 'mode':'libBrListVideos', 'url':''})
+	dict.append({'name':translation(31031), 'mode':'libBrListVideos2', 'url':'http://www.br.de/mediathek/video/suche/tag-suche-mediathek-100~hal_vt-medcc1_-bff08c03fe069a9ee9013704adcbd4855992ad2a.json?t=social&q=mostViewed'})
 	dict.append({'name':translation(31032), 'mode':'libBrListLetters'})
 	dict.append({'name':translation(31033), 'mode':'libBrListDate'})
 	dict.append({'name':translation(31039), 'mode':'libBrSearch'})
 	libMediathek.addEntries(dict)
-	#libMediathek.addEntry({'name':translation(31034), 'mode':'libArdListVideos', 'url':'http://www.ardmediathek.de/appdata/servlet/tv/Rubriken/mehr?documentId=21282550&json'})
+
 	
 	
 	
@@ -51,6 +52,8 @@ def libBrListShows():
 	
 def libBrListVideos():
 	libMediathek.addEntries(libBrJsonParser.parseVideos(params['url']))
+def libBrListVideos2():
+	libMediathek.addEntries(libBrJsonParser.parseLinks(params['url']))
 
 def libBrListDate():
 	libMediathek.populateDirDate('libBrListDateChannels')
@@ -78,9 +81,12 @@ def libBrListSearch(searchString=False):
 	libMediathek.addEntries(search(searchString))
 	
 def libBrPlay():
-	url = libBrJsonParser.parseVideo(params['url'])
+	url,subUrl = libBrJsonParser.parseVideo(params['url'])
 	xbmc.log(url)
 	listitem = xbmcgui.ListItem(path=url)
+	if showSubtitles and subUrl:
+		sub = libMediathek.ttml2Srt(subUrl)
+		listitem.setSubtitles([sub])
 	xbmcplugin.setResolvedUrl(pluginhandle, True, listitem)
 	
 	
@@ -89,6 +95,7 @@ def list():
 	'libBrListLetters': libBrListLetters,
 	'libBrListShows': libBrListShows,
 	'libBrListVideos': libBrListVideos,
+	'libBrListVideos2': libBrListVideos2,
 	'libBrListDate': libBrListDate,
 	'libBrListDateChannels': libBrListDateChannels,
 	'libBrListDateVideos': libBrListDateVideos,
