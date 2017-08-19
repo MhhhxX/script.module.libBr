@@ -1,3 +1,13 @@
+1.0.1
+- Removed xbmc* dependencies
+- Fixed error when browsing the empty directory "Y"
+1.0.0
+- Code cleanup
+0.4.1
+- Code cleanup
+0.4.0
+- Renamed to libbr
+- Misc fixes 
 0.3.3
 - Added "Most viewed"
 - Added subtitle support
