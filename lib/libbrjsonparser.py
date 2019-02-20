@@ -2,6 +2,7 @@
 import json
 import urllib
 import time
+import datetime
 
 import libmediathek3 as libMediathek
 import libbrgraphqlqueries
@@ -194,7 +195,14 @@ def parseDate(day,channel):
 		publicationOf = broadcastEvent['publicationOf']
 		if len(publicationOf['essences']['edges']) != 0:
 			d = _buildVideoDict(publicationOf)
-			d['_airedtime'] = broadcastEvent['start'][11:16]
+			start = broadcastEvent['start'].split('+')
+			if (len(start) == 1):
+				airedtime = datetime.datetime(*(time.strptime(start[0], "%Y-%m-%dT%H:%M:%S.%fZ")[0:6]))
+				tz_offset = datetime.timedelta (minutes = (time.timezone / -60) + (time.localtime().tm_isdst * 60))
+				airedtime += tz_offset
+			else:
+				airedtime = datetime.datetime(*(time.strptime(start[0], "%Y-%m-%dT%H:%M:%S.%f")[0:6]))
+			d['_airedtime'] = airedtime.strftime("%H:%M") 
 			d['_type'] = 'date'
 			l.append(d)
 	return l
@@ -241,7 +249,7 @@ def _parseAllClips(filter):
 	
 def _buildVideoDict(node):
 	d = {}
-	d['_name'] = node['title']
+	d['_name'] = node['kicker'] + ' | ' + node['title'] 
 	d['_tvshowtitle'] = node['kicker']
 	d['_plotoutline'] = node['kicker']
 	d['_plot'] = node['kicker']
