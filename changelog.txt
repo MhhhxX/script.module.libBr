@@ -1,3 +1,14 @@
+2.0.2
+- Improved API calls
+2.0.1
+- Added search function
+2.0.0
+- Rewrote libbr to cover the new API
+1.1.1
+- Temp fix 
+1.1.0
+- Code cleanup
+- Fixed list by date
 1.0.1
 - Removed xbmc* dependencies
 - Fixed error when browsing the empty directory "Y"

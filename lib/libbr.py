@@ -24,43 +24,76 @@ def play(dict):
 
 	
 def libBrListMain():
+	#libBrJsonParser.getIntrospection()
 	l = []
-	l.append({'name':translation(31031), 'mode':'libBrListVideos2', 'url':'http://www.br.de/mediathek/video/suche/tag-suche-mediathek-100~hal_vt-medcc1_-bff08c03fe069a9ee9013704adcbd4855992ad2a.json?t=social&q=mostViewed', '_type':'dir'})
-	l.append({'name':translation(31032), 'mode':'libBrListLetters', '_type':'dir'})
+	#l.append({'name':translation(31031), 'mode':'libBrListNew', '_type':'dir'})
+	l.append({'name':translation(31032), 'mode':'libBrListSeries', '_type':'dir'})
 	l.append({'name':translation(31033), 'mode':'libBrListChannel', '_type':'dir'})
+	l.append({'name':translation(31034), 'mode':'libBrListBoards', '_type':'dir'})
+	l.append({'name':translation(31035), 'mode':'libBrListCategories', '_type':'dir'})
+	#l.append({'name':'Genres', 'mode':'libBrListGenres', '_type':'dir'})
+	#l.append({'name':'#sections', 'mode':'libBrListSections', '_type':'dir'})
 	l.append({'name':translation(31039), 'mode':'libBrSearch', '_type':'dir'})
 	return l
 	
 	
 	
-def libBrListLetters():
-	return libMediathek.populateDirAZ('libBrListShows')
+def libBrListNew():
+	return libBrJsonParser.parseNew()
+		
+		
+
+def libBrListSeries():
+	libMediathek.sortAZ()
+	return libBrJsonParser.parseSeries()	
+def libBrListEpisodes():
+	return libBrJsonParser.parseEpisodes(params['id'])
+
+def libBrListBoards():
+	return libBrJsonParser.parseBoards()	
+def libBrListBoard():
+	return libBrJsonParser.parseBoard(params['boardId'])
+
+def libBrListCategories():
+	return libBrJsonParser.parseCategories()
+def libBrListCategorie():
+	return libBrJsonParser.parseCategorie(params['id'])
+
+#cat
+def libBrListGenres():
+	return libBrJsonParser.parseGenres()
+def libBrListGenre():
+	return libBrJsonParser.parseGenre(params['id'])
 	
-def libBrListShows():
-	return libBrJsonParser.parseShows(params['name'])
-	
-def libBrListVideos():
-	return libBrJsonParser.parseVideos(params['url'])
+def libBrListSections():
+	libMediathek.sortAZ()
+	return libBrJsonParser.parseSections()
+def libBrListSection():
+	return libBrJsonParser.parseSection(params['id'])
+
 def libBrListVideos2():
 	return libBrJsonParser.parseLinks(params['url'])
 
 	
 def libBrListChannel():
 	l = []
-	l.append({'name':'ARD-Alpha', 'mode':'libBrListChannelDate','channel':'ARD-Alpha'})
-	l.append({'name':'BR', 'mode':'libBrListChannelDate','channel':'BR'})
+	l.append({'_name':'ARD-Alpha', 'mode':'libBrListChannelDate','channel':'ARD_alpha', '_type':'dir'})
+	l.append({'_name':'BR', 'mode':'libBrListChannelDate','channel':'BR_Fernsehen', '_type':'dir'})
+	l.append({'_name':'BRde', 'mode':'libBrListChannelDate','channel':'BRde', '_type':'dir'})
 	return l
 
 def libBrListChannelDate():
 	return libMediathek.populateDirDate('libBrListChannelDateVideos',params['channel'],True)
 	
 def libBrListChannelDateVideos():
-	datum = date.today() - timedelta(int(params['datum']))
-	return libBrJsonParser.parseDate(datum.strftime('%Y-%m-%d'),params['channel'])#params['datum'] =yyyy-mm-dd
+	#xdatum = date.today() - timedelta(int(params['datum']))
+	return libBrJsonParser.parseDate(params['yyyymmdd'],params['channel'])#params['datum'] =yyyy-mm-dd
+	#return libBrJsonParser.parseDate(datum.strftime('%Y-%m-%d'),params['channel'])#params['datum'] =yyyy-mm-dd
 	
 def libBrSearch():
 	search_string = libMediathek.getSearchString()
-	return libBrListSearch(search_string)
+	return libBrJsonParser.parseSearch(search_string)
+	#return libBrListSearch(search_string)
 
 def libBrListSearch(searchString=False):
 	if not searchString:
@@ -68,35 +101,41 @@ def libBrListSearch(searchString=False):
 	return search(searchString)
 	
 def libBrPlay():
-	return libBrJsonParser.parseVideo(params['url'])
+	return libBrJsonParser.parseVideo(params['id'])
+def libBrPlayOld():
+	return libBrJsonParser.parseVideoOld(params['url'])
 	
 	
 def list():	
 	modes = {
 	'libBrListMain': libBrListMain,
-	'libBrListLetters': libBrListLetters,
-	'libBrListShows': libBrListShows,
-	'libBrListVideos': libBrListVideos,
+	'libBrListNew': libBrListNew,
+	'libBrListSeries': libBrListSeries,
+	'libBrListEpisodes': libBrListEpisodes,
+	'libBrListBoards': libBrListBoards,
+	'libBrListBoard': libBrListBoard,
+	'libBrListCategories': libBrListCategories,
+	'libBrListCategorie': libBrListCategorie,
+	'libBrListGenres': libBrListGenres,
+	'libBrListGenre': libBrListGenre,
+	'libBrListSections': libBrListSections,
+	'libBrListSection': libBrListSection,
 	'libBrListVideos2': libBrListVideos2,
 	'libBrListChannel': libBrListChannel,
 	'libBrListChannelDate': libBrListChannelDate,
 	'libBrListChannelDateVideos': libBrListChannelDateVideos,
 	'libBrSearch': libBrSearch,
 	'libBrListSearch': libBrListSearch,
-	'libBrPlay': libBrPlay
-	}
-	views = {
-	'libBrListShows': 'shows',
-	'libBrListVideos': 'videos',
-	'libBrListDate': 'videos',
-	'libBrListDateVideos': 'videos',
-	'libBrListSearch': 'videos'
+	'libBrPlay': libBrPlay,
+	'libBrPlayOld': libBrPlayOld
 	}
 	global params
 	params = libMediathek.get_params()
 	mode = params.get('mode','libBrListMain')
 	if mode == 'libBrPlay':
 		libMediathek.play(libBrPlay())
+	elif mode == 'libBrPlayOld':
+		libMediathek.play(libBrPlayOld())
 	else:
 		l = modes.get(mode)()
 		libMediathek.addEntries(l)
