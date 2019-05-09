@@ -3,7 +3,6 @@ import sys
 import urllib
 import libbrjsonparser as libBrJsonParser
 import libmediathek3 as libMediathek
-from datetime import date, timedelta
 
 translation = libMediathek.getTranslation
 
@@ -87,6 +86,8 @@ def libBrListChannelDate():
 	
 def libBrListChannelDateVideos():
 	#xdatum = date.today() - timedelta(int(params['datum']))
+	if 'yyyymmdd' not in params:
+		params['yyyymmdd'] = libMediathek.dialogDate('%Y-%m-%d')
 	return libBrJsonParser.parseDate(params['yyyymmdd'],params['channel'])#params['datum'] =yyyy-mm-dd
 	#return libBrJsonParser.parseDate(datum.strftime('%Y-%m-%d'),params['channel'])#params['datum'] =yyyy-mm-dd
 	
